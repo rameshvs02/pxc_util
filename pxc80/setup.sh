@@ -9,7 +9,9 @@ yum install -y https://repo.percona.com/yum/percona-release-latest.noarch.rpm
 percona-release enable-only pxc-80
 percona-release enable tools release
 yum update -y
+sleep 5
 yum install -y percona-xtradb-cluster-server
+
 
 cat <<EOT >> my.cnf
 [mysqld]
@@ -38,20 +40,35 @@ wsrep_sst_method=xtrabackup-v2
 wsrep_cluster_name=my_centos_cluster
 
 # Authentication for SST method
-pxc_encrypt_cluster_traffic=OFF
+pxc_encrypt_cluster_traffic=ON
 wsrep_cluster_name=pxc-cluster
 wsrep_node_name=pxc-cluster-node-$NODE
 wsrep_slave_threads=8
+early-plugin-load = keyring_file.so
+keyring_file_data = keyring
+ssl-ca = /var/lib/mysql-files/ca.pem
+ssl-cert =  /var/lib/mysql-files/server-cert.pem
+ssl-key =  /var/lib/mysql-files/server-key.pem
+[sst]
+encrypt = 4
+ssl-ca =  /var/lib/mysql-files/ca.pem
+ssl-cert =  /var/lib/mysql-files/server-cert.pem
+ssl-key =  /var/lib/mysql-files/server-key.pem
 EOT
 
 cp my.cnf /etc/my.cnf
 setenforce 0
 
 if [[ $NODE -eq 1 ]]; then
+  mysql_ssl_rsa_setup --datadir /vagrant/
+  cp /vagrant/*pem /var/lib/mysql-files/
+  chown mysql.mysql /var/lib/mysql-files/* -R
   systemctl start mysql@bootstrap.service
   init_pass=$(grep "temporary password" /var/lib/mysql/mysql.err | awk '{print $NF}')
   mysql --connect-expired-password -uroot --password="$init_pass" -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'TestPass';CREATE USER 'root'@'%' IDENTIFIED BY 'TestPass'; GRANT ALL ON *.* TO 'root'@'%' WITH GRANT OPTION;"
 else
+  cp /vagrant/*pem /var/lib/mysql-files/
+  chown mysql.mysql /var/lib/mysql-files/* -R
   systemctl start mysql  
 fi
 
@@ -61,3 +78,4 @@ user=root
 password=TestPass
 EOT
 
+cp /root/.my.cnf /home/vagrant/

@@ -1,0 +1,3 @@
+echo "sysbench /usr/share/sysbench/oltp_write_only.lua --mysql-db=sbtest --mysql-user=proxysql_user --mysql-password=passw0rd --mysql-host=127.0.0.1 --mysql-port=6033 --db-driver=mysql  --threads=10 --tables=10 --time=1000 --report-interval=5 run"
+
+sysbench /usr/share/sysbench/oltp_write_only.lua --mysql-db=sbtest --mysql-user=proxysql_user --mysql-password=passw0rd --mysql-host=127.0.0.1 --mysql-port=6033 --db-driver=mysql  --threads=10 --tables=10 --time=1000 --report-interval=5 run 

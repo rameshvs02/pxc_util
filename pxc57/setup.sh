@@ -62,3 +62,4 @@ user=root
 password=TestPass
 EOT
 
+cp /root/.my.cnf /home/vagrant/

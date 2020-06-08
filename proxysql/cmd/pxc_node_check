@@ -1,0 +1,1 @@
+mysql -e'select hostgroup_id,hostname,port,status from runtime_mysql_servers;'

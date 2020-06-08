@@ -1,0 +1,1 @@
+mysql -e'select hostgroup,srv_host,srv_port,status,ConnUsed,Queries,Bytes_data_sent,Bytes_data_recv from stats_mysql_connection_pool;'
